@@ -84,6 +84,17 @@ public class CrptApi {
         }
     }
 
+    public synchronized void close() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        }
+    }
+
     // Пример работы класса при вызове из разных потоков
     public static void main(String[] args) throws InterruptedException {
         CrptApi crptApi = new CrptApi(TimeUnit.SECONDS, 2);
@@ -112,17 +123,6 @@ public class CrptApi {
                     threadsLeft.wait();
                 }
             }
-        }
-    }
-
-    public synchronized void close() throws InterruptedException {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
         }
     }
 
