@@ -84,10 +84,12 @@ public class CrptApi {
         }
     }
 
+    // Пример работы класса при вызове из разных потоков
     public static void main(String[] args) throws InterruptedException {
         CrptApi crptApi = new CrptApi(TimeUnit.SECONDS, 2);
-        AtomicLong threadsLeft = new AtomicLong(10);
-        for (int i = 0; i < 10; i++) {
+        int threadAmount = 10;
+        AtomicLong threadsLeft = new AtomicLong(threadAmount);
+        for (int i = 0; i < threadAmount; i++) {
             new Thread(() -> {
                 try {
                     crptApi.createDocument(new Document(), "signature", "token", "pg");
@@ -106,6 +108,8 @@ public class CrptApi {
                 if (threadsLeft.get() == 0) {
                     crptApi.close();
                     break;
+                } else {
+                    threadsLeft.wait();
                 }
             }
         }
